@@ -18,7 +18,7 @@ class FTPConnectException {};
 class FTPException {
 public:
     /** Initialize with last server response **/
-    FTPException(const char * lastResponse) : lastResponse(lastResponse) {}
+    explicit FTPException(const char * lastResponse) : lastResponse(lastResponse) {}
     /** Returns last server response **/
     operator const char *() const { return lastResponse; }
     
@@ -51,7 +51,7 @@ public:
         PORT=FTPLIB_PORT
     };
     /** Create new FTP connection **/
-    FTPConnection(const char * host);
+    explicit FTPConnection(const char * host);
     /** Returns last response **/
     const char * getLastResponse();
     /** Set connection mode **/
