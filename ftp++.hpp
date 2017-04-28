@@ -11,14 +11,16 @@
 #include <string>
 #include <sys/types.h>
 
+namespace ftp {
+
 /** Exception during establishing connection to FTP server **/
-class FTPConnectException {};
+class ConnectException {};
 
 /** Exception during remote procedure call **/
-class FTPException {
+class Exception {
 public:
     /** Initialize with last server response **/
-    explicit FTPException(const char * lastResponse) : lastResponse(lastResponse) {}
+    explicit Exception(const char * lastResponse) : lastResponse(lastResponse) {}
     /** Returns last server response **/
     operator const char *() const { return lastResponse; }
     
@@ -27,7 +29,7 @@ private:
 };
 
 /** Base class for FTP connections **/
-class FTPConnectionBase {
+class ConnectionBase {
 public:
     /** Data transfer mode **/
     enum TransferMode {
@@ -35,15 +37,15 @@ public:
         BINARY=FTPLIB_BINARY
     };
     /** Close FTP connection **/
-    virtual ~FTPConnectionBase();
+    virtual ~ConnectionBase();
     
 protected:
     netbuf * conn;
 };
 
 /** FTP main (control) connection **/
-class FTPConnection : public FTPConnectionBase {
-    friend class FTPDataConnection;
+class Connection : public ConnectionBase {
+    friend class DataConnection;
 public:
     /** Connection mode **/
     enum Mode {
@@ -51,7 +53,7 @@ public:
         PORT=FTPLIB_PORT
     };
     /** Create new FTP connection **/
-    explicit FTPConnection(const char * host);
+    explicit Connection(const char * host);
     /** Returns last response **/
     const char * getLastResponse();
     /** Set connection mode **/
@@ -91,7 +93,7 @@ public:
 };
 
 /** FTP data connection **/
-class FTPDataConnection : public FTPConnectionBase {
+class DataConnection : public ConnectionBase {
 public:
     /** Data connection type **/
     enum Type {
@@ -101,12 +103,14 @@ public:
         FILE_WRITE=FTPLIB_FILE_WRITE
     };
     /** Open FTP data connection **/
-    FTPDataConnection(FTPConnection &connection, const char * path, Type type,
+    DataConnection(Connection &connection, const char * path, Type type,
         TransferMode mode);
     /** Read data from a remote file or directory **/
     ssize_t read(void * buffer, size_t length);
     /** Write data to a remote file **/
     ssize_t write(void * buffer, size_t length);
 };
+
+}
 
 #endif
